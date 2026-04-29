@@ -67,50 +67,29 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.post('*', async (req, res) => {
+app.post('/api/checkout', async (req, res) => {
   try {
-    console.log('Connecting to MongoDB...');
     await connectDB();
-    
     const checkoutData = req.body;
-    console.log('Received Checkout Data:', checkoutData);
-
-    if (!checkoutData.firstName || !checkoutData.lastName || !checkoutData.email) {
-      return res.status(400).json({ 
-        success: false, 
-        message: 'Missing required fields: First Name, Last Name, and Email are mandatory.' 
-      });
-    }
-
-    const orderId = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
     
-    const newOrder = new Order({
-      ...checkoutData,
-      orderId
-    });
-
+    const orderId = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+    const newOrder = new Order({ ...checkoutData, orderId });
     await newOrder.save();
-    console.log('Order saved to DB');
-
+    
     await sendCheckoutEmail(checkoutData, orderId);
 
-    res.status(200).json({
-      success: true,
-      message: 'Order processed successfully!',
-      orderId
-    });
+    res.status(200).json({ success: true, message: 'Order processed!', orderId });
   } catch (error) {
-    console.error('SERVER ERROR:', error.message);
-    res.status(500).json({
-      success: false,
-      message: 'Server Error: ' + error.message,
-      debug: error.stack
-    });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 app.get('/', (req, res) => {
   res.send('Checkout API is running...');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
 module.exports = app;
