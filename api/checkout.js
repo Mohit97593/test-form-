@@ -55,6 +55,9 @@ const PORT = process.env.PORT || 5000;
 
 // Database Connection
 const connectDB = async () => {
+  if (!process.env.MONGODB_URI) {
+    throw new Error('MONGODB_URI environment variable is missing.');
+  }
   if (mongoose.connection.readyState >= 1) return;
   return mongoose.connect(process.env.MONGODB_URI);
 };
@@ -65,53 +68,49 @@ app.use(express.json());
 
 // Routes
 app.post('/', async (req, res) => {
-  await connectDB();
-  const checkoutData = req.body;
-  
-  console.log('Received Checkout Data:', checkoutData);
-
-  // Validation
-  if (!checkoutData.firstName || !checkoutData.lastName || !checkoutData.email) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Missing required fields: First Name, Last Name, and Email are mandatory.' 
-    });
-  }
-
   try {
+    console.log('Connecting to MongoDB...');
+    await connectDB();
+    
+    const checkoutData = req.body;
+    console.log('Received Checkout Data:', checkoutData);
+
+    if (!checkoutData.firstName || !checkoutData.lastName || !checkoutData.email) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Missing required fields: First Name, Last Name, and Email are mandatory.' 
+      });
+    }
+
     const orderId = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
     
-    // Create new order in DB
     const newOrder = new Order({
       ...checkoutData,
       orderId
     });
 
     await newOrder.save();
+    console.log('Order saved to DB');
 
-    // Send email notification
     await sendCheckoutEmail(checkoutData, orderId);
 
     res.status(200).json({
       success: true,
-      message: 'Order saved to database successfully!',
+      message: 'Order processed successfully!',
       orderId
     });
   } catch (error) {
-    console.error('Error saving order:', error);
+    console.error('SERVER ERROR:', error.message);
     res.status(500).json({
       success: false,
-      message: 'Database error. Please try again later.'
+      message: 'Server Error: ' + error.message,
+      debug: error.stack
     });
   }
 });
 
 app.get('/', (req, res) => {
   res.send('Checkout API is running...');
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
 });
 
 module.exports = app;
