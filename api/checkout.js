@@ -67,7 +67,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.post('/', async (req, res) => {
+app.post('*', async (req, res) => {
   try {
     console.log('Connecting to MongoDB...');
     await connectDB();
