@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 const mongoose = require('mongoose');
-const Order = require('./models/Order');
+const Order = require('../server/models/Order');
 
 dotenv.config();
 
@@ -63,7 +63,7 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.post('/api/checkout', async (req, res) => {
+app.post('/', async (req, res) => {
   const checkoutData = req.body;
   
   console.log('Received Checkout Data:', checkoutData);
