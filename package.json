@@ -10,8 +10,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@getbrevo/brevo": "^5.0.4",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.12.0",
+    "mongoose": "^8.23.1",
     "react": "^19.2.5",
     "react-dom": "^19.2.5"
   },
