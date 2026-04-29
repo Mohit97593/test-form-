@@ -54,9 +54,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // Database Connection
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch(err => console.error('Could not connect to MongoDB:', err));
+const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) return;
+  return mongoose.connect(process.env.MONGODB_URI);
+};
 
 // Middleware
 app.use(cors());
@@ -64,6 +65,7 @@ app.use(express.json());
 
 // Routes
 app.post('/', async (req, res) => {
+  await connectDB();
   const checkoutData = req.body;
   
   console.log('Received Checkout Data:', checkoutData);
