@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 const mongoose = require('mongoose');
-const Order = require('../server/models/Order');
+const Order = require('./models/Order');
 
 dotenv.config();
 
