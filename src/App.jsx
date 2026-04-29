@@ -84,7 +84,7 @@ function App() {
     setStatus({ type: '', message: '' })
 
     try {
-      const response = await fetch('/api/checkout', {
+      const response = await fetch('https://test-form-backend-eosin.vercel.app/api/checkout', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
